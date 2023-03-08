@@ -4,6 +4,7 @@ using System.Text.Json.Serialization;
 using TestAPI2;
 using TestAPI2.Context;
 using TestAPI2.Services;
+using TestAPI2.Services.Interfaces;
 
 var builder = WebApplication.CreateBuilder(args);
 

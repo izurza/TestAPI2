@@ -2,7 +2,7 @@
 {
     public class FacturaDto
     {
-        public int? FkCliente { get; set; }
+        public ClienteDto? Cliente { get; set; }
 
         public DateTime? Fecha { get; set; }
     }

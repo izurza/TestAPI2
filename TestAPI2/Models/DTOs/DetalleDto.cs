@@ -3,11 +3,11 @@
     public class DetalleDto
     {
 
-        public int? FkFactura { get; set; }
+        public FacturaDto? Factura { get; set; }
 
         public double? Cantidad { get; set; }
 
-        public int? FkProducto { get; set; }
+        public ProductoDto Producto { get; set; }
 
     }
 }

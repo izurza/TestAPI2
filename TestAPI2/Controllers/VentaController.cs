@@ -1,6 +1,8 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.StaticFiles;
+using System.Net.Mime;
 using TestAPI2.Models;
-using TestAPI2.Services;
+using TestAPI2.Services.Interfaces;
 
 namespace TestAPI2.Controllers
 {
@@ -28,6 +30,20 @@ namespace TestAPI2.Controllers
 
             return StatusCode(StatusCodes.Status200OK, ventas);
         }
+        [HttpGet("detalle/{id}")]
+        public async Task<IActionResult> GetDetalle(int id)
+        {
+            var detalle = await _ventaService.GetDetalleAsync(id);
+
+            if (detalle is null)
+            {
+                return StatusCode(StatusCodes.Status204NoContent, "No se han encontrado detalle");
+            }
+
+            return StatusCode(StatusCodes.Status200OK, detalle);
+        }
+
+        
 
         [HttpGet("Facturas")]
         public async Task<IActionResult> GetFacturas()
@@ -93,24 +109,19 @@ namespace TestAPI2.Controllers
 
         }
 
-        [HttpDelete("DeleteClientCascada")]
-        public async Task<IActionResult> DeleteClientCascada([FromForm] Cliente client)
+     
+
+        [HttpPost("Fill")]
+        public async Task<IActionResult> FillDb()
         {
 
-            //var facturas = await _ventaService.DeleteFacturasByClienteAsync(client);
-            
-            //Console.WriteLine(facturas.Item2);
+            await _ventaService.FillDb();
 
-            var result = await _ventaService.DeleteClienteAsync(client);
-            return StatusCode(StatusCodes.Status200OK);//result.Item1 ? StatusCode(StatusCodes.Status200OK, result.Item2) : StatusCode(StatusCodes.Status400BadRequest, result.Item2); 
+            return StatusCode(StatusCodes.Status200OK);
         }
+
         
-        [HttpDelete("DeleteClientTransaction")]
-        public async Task<IActionResult> DeleteClientTransaction([FromForm] Cliente client)
-        { 
-            var result = await _ventaService.DeleteClienteTransactionAsync(client);
-            return StatusCode(StatusCodes.Status200OK);//result.Item1 ? StatusCode(StatusCodes.Status200OK, result.Item2) : StatusCode(StatusCodes.Status400BadRequest, result.Item2); 
-        }
+
 
 
 

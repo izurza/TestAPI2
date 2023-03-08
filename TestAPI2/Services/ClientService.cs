@@ -196,12 +196,12 @@ namespace TestAPI2.Services
             }
         }
 
-        public async Task<(bool, string)> DeleteClienteAsync(Cliente client)//Delete en cascada no mola
+        public async Task<(bool, string)> DeleteClienteAsync(int clientId)//Delete en cascada no mola
         {
             try
             {
                 var dbClient = _context.Clientes
-            .Where(i => i.IdCliente == client.IdCliente)
+            .Where(i => i.IdCliente == clientId)
             .Include("Facturas.Detalles")
             .SingleOrDefault();
                 if (dbClient is null)

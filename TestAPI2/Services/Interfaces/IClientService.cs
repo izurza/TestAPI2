@@ -13,7 +13,7 @@ namespace TestAPI2.Services.Interfaces
         Task<ClienteDto> AddClienteAsync(Cliente client);//POST Client
         Task<int> ImportClientesFromCSVAsync(IFormFile clientCSV);
         Task<ClienteDto> UpdateClienteAsync(Cliente client);//PUT
-        Task<(bool, string)> DeleteClienteAsync(Cliente client);//DELETE
+        Task<(bool, string)> DeleteClienteAsync(int clientId);//DELETE
         Task<(bool, string)> DeleteClienteTransactionAsync(int clientId);
         Task<(bool, string)> DeleteTestAsync();
     }

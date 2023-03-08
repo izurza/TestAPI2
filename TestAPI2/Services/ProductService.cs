@@ -110,18 +110,18 @@ namespace TestAPI2.Services
                 return null;
             }
         }
-        public async Task<(bool, string)> DeleteProductoAsync(Producto producto)
+        public async Task<(bool, string)> DeleteProductoAsync(int productoId)
         {
             try
             {
-                var dbProduct = await _context.Productos.FindAsync(producto.IdProducto);
+                var dbProduct = await _context.Productos.FindAsync(productoId);
 
                 if (dbProduct is null)
                 {
                     return (false, "Producto no encontrado");
                 }
 
-                _context.Remove(producto);
+                _context.Remove(dbProduct);
                 await _context.SaveChangesAsync();
 
                 return (true, "Producto eliminado");

@@ -44,10 +44,10 @@ namespace TestAPI2.Controllers
         }
 
 
-        [HttpDelete("DeleteClientCascada")]
-        public async Task<IActionResult> DeleteClientCascada([FromForm] Cliente client)
+        [HttpDelete("DeleteClientCascada/{clienteId:int}")]
+        public async Task<IActionResult> DeleteClientCascada([FromRoute] int clientId)
         {
-            var result = await _clientService.DeleteClienteAsync(client);
+            var result = await _clientService.DeleteClienteAsync(clientId);
             return result.Item1 ? StatusCode(StatusCodes.Status200OK, result.Item2) : StatusCode(StatusCodes.Status400BadRequest, result.Item2); 
         }
 

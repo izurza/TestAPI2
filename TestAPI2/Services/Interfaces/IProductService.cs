@@ -10,6 +10,6 @@ namespace TestAPI2.Services.Interfaces
         Task<ProductoDto> GetProductoAsync(int id);//Get single
         Task<ProductoDto> AddProductoAsync(Producto producto);//POST 
         Task<ProductoDto> UpdateProductoAsync(Producto producto);//PUT
-        Task<(bool, string)> DeleteProductoAsync(Producto producto);//DELETE
+        Task<(bool, string)> DeleteProductoAsync(int productoId);//DELETE
     }
 }

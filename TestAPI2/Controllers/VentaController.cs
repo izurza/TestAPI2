@@ -12,10 +12,12 @@ namespace TestAPI2.Controllers
     {
 
         private readonly IVentaService _ventaService;
+        private readonly IClientService _clientService;
 
-        public VentaController(IVentaService ventaService)
+        public VentaController(IVentaService ventaService, IClientService clientService)
         {
             _ventaService = ventaService;
+            _clientService = clientService;
         }
 
         [HttpGet("ventas")]
@@ -62,21 +64,20 @@ namespace TestAPI2.Controllers
         public async Task<IActionResult> Comprar([FromForm] string nombreCliente, [FromForm] string apellidoCliente, [FromForm] int[] cantidades, [FromForm] int[] productos)//), [FromForm] string nombre)
         {
 
-            Console.WriteLine(nombreCliente);
             if (nombreCliente is null || apellidoCliente is null)
             {
                 return StatusCode(StatusCodes.Status400BadRequest, "Introduce nombre y apellido de cliente");
             }
             else
             {
-                var clienteExistente = await _ventaService.GetClienteByNameAsync(nombreCliente, apellidoCliente);
+                var clienteExistente = await /*_ventaService*/_clientService.GetClienteByNameAsync(nombreCliente, apellidoCliente);
 
                 if (clienteExistente is null)
                 {
                     Cliente nuevoCliente = new Cliente();
                     nuevoCliente.NombreCliente = nombreCliente;
                     nuevoCliente.ApellidoCliente = apellidoCliente;
-                    await _ventaService.AddClienteAsync(nuevoCliente);
+                    await /*_ventaService*/_clientService.AddClienteAsync(nuevoCliente);
                     clienteExistente = nuevoCliente;
                 }
 
@@ -92,6 +93,7 @@ namespace TestAPI2.Controllers
                     detalle.FkFactura = facturaActual.IdFactura;
                     detalle.Cantidad = cantidades[i];
                     detalle.FkProducto = productos[i];
+                    facturaActual.Detalles.Add(detalle);
                     await _ventaService.AddDetalleAsync(detalle);
                 }
                 //foreach (var cantidad_producto in cesta)

@@ -10,5 +10,10 @@
 
         public string? DireccionCliente { get; set; }
 
+        public string ToCSV() 
+        {
+            return String.Format("\"{0}\";\"{1}\";\"{2}\";\"{3}\"", NombreCliente, ApellidoCliente, EmailCliente, DireccionCliente);
+            //return String.Format("\"{0}\",\"{1}\",\"{2}\",\"{3}\"", NombreCliente, ApellidoCliente, EmailCliente, DireccionCliente);
+        }
     }
 }

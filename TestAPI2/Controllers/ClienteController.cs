@@ -31,34 +31,39 @@ namespace TestAPI2.Controllers
         }
 
 
-        [HttpPost]
+        [HttpGet("GetClientsCSV")]
         public async Task<IActionResult> DownloadCustomers()
         {
-
-
-
-            //lo que sea
-            return File(null, "text/csv", "Clientes.csv");// --> Array de bytes y el content string de un csv
+          return File(await _clientService.ClientesToCSV(), "text/csv", "Clientes.csv");// --> Array de bytes y el content string de un csv
+        }
+        [HttpPost("UploadClientsCSV")]
+        public async Task<IActionResult> UploadCustomers(IFormFile clientCSV)
+        {
+            
+            int rowsAffected = await _clientService.ImportClientesFromCSVAsync(clientCSV);
+            return StatusCode(StatusCodes.Status200OK, rowsAffected+" Rows Affected");
         }
 
 
         [HttpDelete("DeleteClientCascada")]
         public async Task<IActionResult> DeleteClientCascada([FromForm] Cliente client)
         {
-
-            //var facturas = await _ventaService.DeleteFacturasByClienteAsync(client);
-
-            //Console.WriteLine(facturas.Item2);
-
             var result = await _clientService.DeleteClienteAsync(client);
-            return StatusCode(StatusCodes.Status200OK);//result.Item1 ? StatusCode(StatusCodes.Status200OK, result.Item2) : StatusCode(StatusCodes.Status400BadRequest, result.Item2); 
+            return result.Item1 ? StatusCode(StatusCodes.Status200OK, result.Item2) : StatusCode(StatusCodes.Status400BadRequest, result.Item2); 
         }
 
         [HttpDelete("DeleteClientTransaction/{clientId:int}")]
         public async Task<IActionResult> DeleteClientTransaction([FromRoute] int clientId)
         {
             var result = await _clientService.DeleteClienteTransactionAsync(clientId);
-            return StatusCode(StatusCodes.Status200OK);//result.Item1 ? StatusCode(StatusCodes.Status200OK, result.Item2) : StatusCode(StatusCodes.Status400BadRequest, result.Item2); 
+            return result.Item1 ? StatusCode(StatusCodes.Status200OK, result.Item2) : StatusCode(StatusCodes.Status400BadRequest, result.Item2); 
+        }
+
+        [HttpDelete("DeleteTest")]
+        public async Task<IActionResult> DeleteTest()
+        {
+            var result = await _clientService.DeleteTestAsync();
+            return result.Item1 ? StatusCode(StatusCodes.Status200OK, result.Item2) : StatusCode(StatusCodes.Status400BadRequest, result.Item2); 
         }
     }
 }

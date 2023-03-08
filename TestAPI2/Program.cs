@@ -12,7 +12,9 @@ var builder = WebApplication.CreateBuilder(args);
 // Add services to the container
 string _connectionString = builder.Configuration.GetConnectionString("LocalDB");
 builder.Services.AddControllers();
+builder.Services.AddScoped<IProductService, ProductService>();
 builder.Services.AddScoped<IVentaService, VentaService>();
+builder.Services.AddScoped<IClientService, ClientService>();
 builder.Services.AddControllers().AddJsonOptions(x => x.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles);
 builder.Services.AddDbContext<VentaContext>(opt => opt.UseSqlServer(_connectionString ?? throw new Exception("Missing Connection String"))/*, ServiceLifetime.Transient*/);
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle

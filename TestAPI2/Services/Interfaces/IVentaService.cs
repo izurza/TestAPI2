@@ -11,7 +11,6 @@ namespace TestAPI2.Services.Interfaces
         //Factura
         Task<List<FacturaDto>> GetFacturasAsync();//Get ALL 
         Task<FacturaDto> GetFacturaAsync(int id);//Get single
-        Task<int> GetLastFacturaIdAsync();//
         Task<Factura> AddFacturaAsync(Factura factura);//POST 
         Task<FacturaDto?> AddFacturaDtoAsync(Factura factura);
         Task<FacturaDto> UpdateFacturaAsync(Factura factura);//PUT

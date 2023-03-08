@@ -3,6 +3,7 @@ using TestAPI2.Models.DTOs;
 using TestAPI2.Models;
 using TestAPI2.Services.Interfaces;
 using TestAPI2.Context;
+using System.Text;
 
 namespace TestAPI2.Services
 {
@@ -79,6 +80,30 @@ namespace TestAPI2.Services
             }
         }
 
+        public async Task<byte[]> ClientesToCSV()
+        {
+            List<ClienteDto> clientes = await _context.Clientes
+                .Select( c => new ClienteDto
+                {
+                    NombreCliente = c.NombreCliente.Trim(),
+                    ApellidoCliente = c.ApellidoCliente.Trim(),
+                    EmailCliente = c.EmailCliente.Trim(),
+                    DireccionCliente= c.DireccionCliente.Trim()
+                })
+                .ToListAsync();
+            StringBuilder sb = new StringBuilder();
+            sb.AppendLine("\"NombreCliente\";\"ApellidoCliente\";\"EmailCliente\";\"DireccionCliente\"");
+            //sb.AppendLine("\"NombreCliente\",\"ApellidoCliente\",\"EmailCliente\",\"DireccionCliente\"");
+            foreach (ClienteDto cliente in clientes)
+            {
+                sb.AppendLine(cliente.ToCSV());
+            }
+            string csv = sb.ToString();
+
+            return Encoding.ASCII.GetBytes(csv);
+        }
+
+        
 
         public async Task<ClienteDto?> AddClienteAsync(Cliente client)
         {
@@ -103,6 +128,47 @@ namespace TestAPI2.Services
             catch (Exception ex)
             {
                 return null;
+            }
+        }
+        public async Task<int> ImportClientesFromCSVAsync(IFormFile clientCSV)
+        {
+
+
+            using var transaction = await _context.Database.BeginTransactionAsync();
+            try
+            { 
+                Stream stream = clientCSV.OpenReadStream();
+                byte[] read = new byte[stream.Length];
+                for (int i = 0; i < stream.Length; i++)
+                {
+                    read[i] = ((byte)stream.ReadByte());
+                }
+                string plainContent = Encoding.ASCII.GetString(read);
+                string[] lineas = plainContent.Split("\n");
+                int rowsAffected = 0;
+                for (int i = 1; i<lineas.Length-1; i++)
+                {
+                    await _context.Clientes.AddAsync(new Cliente
+                    {
+                        NombreCliente = lineas[i].Split(";")[0],
+                        ApellidoCliente = lineas[i].Split(";")[1],
+                        EmailCliente = lineas[i].Split(";")[2],
+                        DireccionCliente = lineas[i].Split(";")[3]
+                    });
+                    rowsAffected++;
+                }
+
+
+                await _context.SaveChangesAsync();
+                await transaction.CommitAsync();
+                //return await _context.Clientes.FindAsync(client.IdCliente);
+                return rowsAffected;
+
+            }
+            catch (Exception ex)
+            {
+                await transaction.RollbackAsync();
+                return -1;
             }
         }
 
@@ -197,7 +263,43 @@ namespace TestAPI2.Services
 
 
         }
+        public async Task<(bool, string)> DeleteTestAsync()
+        {
+            using var transaction = await _context.Database.BeginTransactionAsync();
+            try
+            {
+                int rowsAffected = 0;
+                var dbClient = await _context.Clientes
+         .OrderBy(i => i.IdCliente)
+         .LastOrDefaultAsync();
+                if (dbClient is null)
+                {
+                    return (false, "Cliente no encontrado");
+                }
+                int inicio = dbClient.IdCliente;
+                int fin = dbClient.IdCliente - 26;
+                for(int i=inicio; i>fin; i--)
+                {
+                    var cliente = await _context.Clientes
+                        .Where(c=> c.IdCliente == i)
+                        .SingleOrDefaultAsync();
+                    
+                    _context.Remove(cliente);
+                    rowsAffected++;
+                }
+                
+                
+                await _context.SaveChangesAsync();
+                await transaction.CommitAsync();
+                return (true, rowsAffected + " Clientes eliminados");
+            }
+            catch (Exception ex)
+            {
+                await transaction.RollbackAsync();
+                return (false, $"Error {ex.Message}");
+            }
+        }
 
-        #endregion Clientes
-    }
+            #endregion Clientes
+        }
 }

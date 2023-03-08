@@ -390,38 +390,38 @@ namespace TestAPI2.Services
         public async Task<int> FillDb()
         {
 
-            List<Cliente> list = new List<Cliente>();
+            //List<Cliente> list = new List<Cliente>();
             //List<Producto> list2 = new List<Producto>();
-            list.Add(new Cliente
-            {
-                NombreCliente = "Papa",
-            ApellidoCliente = "Ratzinger",
-               EmailCliente = "@gmail.com",
-                DireccionCliente = "Roma"
-            });
-            list.Add(new Cliente
-            {
-                NombreCliente = "Salma",
-                ApellidoCliente = "Jayek",
-                EmailCliente = "@gmail.com",
-                DireccionCliente = "NY"
-            });
-            list.Add(new Cliente
-            {
-                NombreCliente = "Jackie",
-                ApellidoCliente = "Chan",
-                EmailCliente = "@gmail.com",
-                DireccionCliente = "China"
-            });
+            //list.Add(new Cliente
+            //{
+            //    NombreCliente = "Papa",
+            //ApellidoCliente = "Ratzinger",
+            //   EmailCliente = "@gmail.com",
+            //    DireccionCliente = "Roma"
+            //});
+            //list.Add(new Cliente
+            //{
+            //    NombreCliente = "Salma",
+            //    ApellidoCliente = "Jayek",
+            //    EmailCliente = "@gmail.com",
+            //    DireccionCliente = "NY"
+            //});
+            //list.Add(new Cliente
+            //{
+            //    NombreCliente = "Jackie",
+            //    ApellidoCliente = "Chan",
+            //    EmailCliente = "@gmail.com",
+            //    DireccionCliente = "China"
+            //});
 
             //await _context.AddRangeAsync(list);
             //await _context.SaveChangesAsync();
 
-            foreach (var item in list)
-            {
-                await _context.Clientes.AddAsync(item);
-                await _context.SaveChangesAsync();
-            }
+            //foreach (var item in list)
+            //{
+            //    await _context.Clientes.AddAsync(item);
+            //    await _context.SaveChangesAsync();
+            //}
 
             //list2.Add(new Producto
             //{
@@ -457,7 +457,7 @@ namespace TestAPI2.Services
                 .Select(i => i.IdProducto)
                 .ToListAsync();
 
-            for (int i =0; i<5; i++)
+            for (int i =0; i<50; i++)
             {
                 Factura factura = new Factura
                 {
@@ -465,11 +465,11 @@ namespace TestAPI2.Services
                     Fecha = DateTime.Now
                 };
                 await _context.Facturas.AddAsync(factura);
-                await _context.SaveChangesAsync();
+                //await _context.SaveChangesAsync();
 
                 Factura? facturaActual = await _context.Facturas.OrderBy(i => i.IdFactura).LastOrDefaultAsync();
                 
-                for (int x=0; x<5;x++)
+                for (int x=0; x<new Random().Next(10);x++)
                 {
                     Detalle detalle = new Detalle
                     {
@@ -479,9 +479,11 @@ namespace TestAPI2.Services
                     };
 
                     await _context.Detalles.AddAsync(detalle);
-                    await _context.SaveChangesAsync();
+                    //await _context.SaveChangesAsync();
                 }
+                //await _context.SaveChangesAsync();
             }
+            await _context.SaveChangesAsync();
             return 1;
         }
     }

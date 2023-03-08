@@ -39,7 +39,6 @@ namespace TestAPI2.Controllers
         [HttpPost("UploadClientsCSV")]
         public async Task<IActionResult> UploadCustomers(IFormFile clientCSV)
         {
-            
             int rowsAffected = await _clientService.ImportClientesFromCSVAsync(clientCSV);
             return StatusCode(StatusCodes.Status200OK, rowsAffected+" Rows Affected");
         }

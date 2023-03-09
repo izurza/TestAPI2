@@ -9,6 +9,13 @@ var builder = WebApplication.CreateBuilder(args);
 string _connectionString = builder.Configuration.GetConnectionString("LocalDB");
 
 
+builder.Services.ScanServices();
+//builder.Services.Scan(s => s
+    //.FromAssemblyOf<IApiService>()
+    //.AddClasses(c => c.AssignableTo<IApiService>())
+    //.AsImplementedInterfaces()
+    //.WithScopedLifetime());
+
 builder.Services.ConfigureJsonOption();//Replaces function below
 // Customize the JSON serialization options used by minimal with following line
 //builder.Services.Configure<Microsoft.AspNetCore.Http.Json.JsonOptions>(o => 
@@ -21,9 +28,10 @@ builder.Services.ConfigureJsonOption();//Replaces function below
 //    });
 
 //builder.Services.AddControllers(); // Not needed on Minimal APIs
-builder.Services.AddScoped<IProductService, ProductService>();
-builder.Services.AddScoped<IVentaService, VentaService>();
-builder.Services.AddScoped<IClientService, ClientService>();
+
+//builder.Services.AddScoped<IProductService, ProductService>();
+//builder.Services.AddScoped<IVentaService, VentaService>();
+//builder.Services.AddScoped<IClientService, ClientService>();
 
 
 builder.Services.AddPersistence(_connectionString);// Replaces the line below

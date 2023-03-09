@@ -14,15 +14,25 @@ public class ProductModule : ICarterModule
 
         var productos = app.MapGroup("/Productos");
 
-        productos.MapGet("/", GetProductos);
+        productos.MapGet("/", GetProductos)
+            .Produces<List<ProductoDto>>(StatusCodes.Status200OK)
+            .Produces(StatusCodes.Status204NoContent);
 
-        productos.MapGet("/{id:int}", GetProducto);
+        productos.MapGet("/{id:int}", GetProducto)
+            .Produces<ProductoDto>(StatusCodes.Status200OK)
+            .Produces(StatusCodes.Status404NotFound);
 
-        productos.MapPost("", AddProducto);
+        productos.MapPost("", AddProducto)
+            .Produces<ProductoDto>(StatusCodes.Status200OK)
+            .Produces(StatusCodes.Status400BadRequest);
 
-        productos.MapPut("/{id:int}", UpdateProducto);
+        productos.MapPut("/{id:int}", UpdateProducto)
+            .Produces<ProductoDto>(StatusCodes.Status200OK)
+            .Produces(StatusCodes.Status400BadRequest);
 
-        productos.MapDelete("/{id:int}", DeleteProducto);
+        productos.MapDelete("/{id:int}", DeleteProducto)
+            .Produces<(bool, string)>(StatusCodes.Status200OK)
+            .Produces<(bool, string)>(StatusCodes.Status400BadRequest);
         #endregion Productos
     }
     #region Product Functions

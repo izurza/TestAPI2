@@ -12,13 +12,22 @@ public class VentasModule : ICarterModule
     {
         #region Ventas
         var ventas = app.MapGroup("/Ventas");
-        ventas.MapGet("/", GetVentas);
 
-        ventas.MapGet("/{id:int}", GetDetalle);
+        ventas.MapGet("/", GetVentas)
+            .Produces<List<DetalleDto>>(StatusCodes.Status200OK)
+            .Produces(StatusCodes.Status204NoContent);
 
-        ventas.MapGet("/Facturas", GetFacturas);
+        ventas.MapGet("/{id:int}", GetDetalle)
+            .Produces<DetalleDto>(StatusCodes.Status200OK)
+            .Produces(StatusCodes.Status400BadRequest);
 
-        ventas.MapPost("/Comprar", Comprar);
+        ventas.MapGet("/Facturas", GetFacturas)
+            .Produces<List<FacturaDto>>(StatusCodes.Status200OK)
+            .Produces(StatusCodes.Status204NoContent);
+            
+        ventas.MapPost("/Comprar", Comprar)
+            .Produces<Factura>(StatusCodes.Status200OK)
+            .Produces(StatusCodes.Status400BadRequest);
         #endregion Ventas
     }
     #region Ventas Functions

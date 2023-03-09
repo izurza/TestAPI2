@@ -5,136 +5,135 @@ using TestAPI2.Models.DTOs;
 using TestAPI2.Models;
 using TestAPI2.Services.Interfaces;
 
-namespace TestAPI2.Services
+namespace TestAPI2.Services;
+
+public class ProductService : IProductService
 {
-    public class ProductService : IProductService
+
+    private readonly VentaContext _context;
+
+    public ProductService(VentaContext context) 
+    { 
+        _context = context;
+    }
+
+    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    #region Productos
+
+    #region Get
+    public async Task<ProductoDto?> GetProductoAsync(int id)
     {
-
-        private readonly VentaContext _context;
-
-        public ProductService(VentaContext context) 
-        { 
-            _context = context;
-        }
-
-        /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-        /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-        /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-        /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-        #region Productos
-
-        #region Get
-        public async Task<ProductoDto?> GetProductoAsync(int id)
+        try
         {
-            try
-            {
-                return await _context.Productos
-                    .AsNoTracking()
-                    .Where(i => i.IdProducto == id)
-                    .Select(p => new ProductoDto
-                    {
-                        NombreProducto = p.NombreProducto,
-                        DescripcionProducto = p.DescripcionProducto,
-                        PrecioProducto = p.PrecioProducto
-                    })
-                    .SingleOrDefaultAsync();
-            }
-            catch (Exception ex)
-            {
-                return null;
-            }
+            return await _context.Productos
+                .AsNoTracking()
+                .Where(i => i.IdProducto == id)
+                .Select(p => new ProductoDto
+                {
+                    NombreProducto = p.NombreProducto,
+                    DescripcionProducto = p.DescripcionProducto,
+                    PrecioProducto = p.PrecioProducto
+                })
+                .SingleOrDefaultAsync();
         }
-
-        public async Task<List<ProductoDto>> GetProductosAsync()
+        catch (Exception ex)
         {
-            try
-            {
-                return await _context.Productos
-                    .AsNoTracking()
-                    .Select(p => new ProductoDto
-                    {
-                        NombreProducto = p.NombreProducto,
-                        DescripcionProducto = p.DescripcionProducto,
-                        PrecioProducto = p.PrecioProducto
-                    })
-                    .ToListAsync();
-            }
-            catch (Exception ex)
-            {
-                return null;
-            }
+            return null;
         }
+    }
+
+    public async Task<List<ProductoDto>> GetProductosAsync()
+    {
+        try
+        {
+            return await _context.Productos
+                .AsNoTracking()
+                .Select(p => new ProductoDto
+                {
+                    NombreProducto = p.NombreProducto,
+                    DescripcionProducto = p.DescripcionProducto,
+                    PrecioProducto = p.PrecioProducto
+                })
+                .ToListAsync();
+        }
+        catch (Exception ex)
+        {
+            return null;
+        }
+    }
 #endregion Get
 
-        public async Task<ProductoDto?> AddProductoAsync(Producto producto)
+    public async Task<ProductoDto?> AddProductoAsync(Producto producto)
+    {
+        try
         {
-            try
-            {
-                await _context.Productos.AddAsync(producto);
-                await _context.SaveChangesAsync();
-                return await _context.Productos
-                    .AsNoTracking()
-                    .Where(i => i.IdProducto == producto.IdProducto)
-                    .Select(p => new ProductoDto
-                    {
-                        NombreProducto = p.NombreProducto,
-                        DescripcionProducto = p.DescripcionProducto,
-                        PrecioProducto = p.PrecioProducto
-                    })
-                    .SingleOrDefaultAsync();
-            }
-            catch (Exception ex)
-            {
-                return null;
-            }
-        }
-        public async Task<ProductoDto?> UpdateProductoAsync(Producto producto)
-        {
-            try
-            {
-                _context.Entry(producto).State = EntityState.Modified;
-                await _context.SaveChangesAsync();
-                return await _context.Productos
-                    .AsNoTracking()
-                    .Where(i => i.IdProducto == producto.IdProducto)
-                    .Select(p => new ProductoDto
-                    {
-                        NombreProducto = p.NombreProducto,
-                        DescripcionProducto = p.DescripcionProducto,
-                        PrecioProducto = p.PrecioProducto
-                    })
-                    .SingleOrDefaultAsync();
-            }
-            catch (Exception ex)
-            {
-                return null;
-            }
-        }
-        public async Task<(bool, string)> DeleteProductoAsync(int productoId)
-        {
-            try
-            {
-                var dbProduct = await _context.Productos.FindAsync(productoId);
-
-                if (dbProduct is null)
+            await _context.Productos.AddAsync(producto);
+            await _context.SaveChangesAsync();
+            return await _context.Productos
+                .AsNoTracking()
+                .Where(i => i.IdProducto == producto.IdProducto)
+                .Select(p => new ProductoDto
                 {
-                    return (false, "Producto no encontrado");
-                }
-
-                _context.Remove(dbProduct);
-                await _context.SaveChangesAsync();
-
-                return (true, "Producto eliminado");
-            }
-            catch (Exception ex)
-            {
-                return (false, $"Error {ex.Message}");
-            }
+                    NombreProducto = p.NombreProducto,
+                    DescripcionProducto = p.DescripcionProducto,
+                    PrecioProducto = p.PrecioProducto
+                })
+                .SingleOrDefaultAsync();
         }
-
-        #endregion Productos
-
-
-
+        catch (Exception ex)
+        {
+            return null;
+        }
     }
+    public async Task<ProductoDto?> UpdateProductoAsync(Producto producto)
+    {
+        try
+        {
+            _context.Entry(producto).State = EntityState.Modified;
+            await _context.SaveChangesAsync();
+            return await _context.Productos
+                .AsNoTracking()
+                .Where(i => i.IdProducto == producto.IdProducto)
+                .Select(p => new ProductoDto
+                {
+                    NombreProducto = p.NombreProducto,
+                    DescripcionProducto = p.DescripcionProducto,
+                    PrecioProducto = p.PrecioProducto
+                })
+                .SingleOrDefaultAsync();
+        }
+        catch (Exception ex)
+        {
+            return null;
+        }
+    }
+    public async Task<(bool, string)> DeleteProductoAsync(int productoId)
+    {
+        try
+        {
+            var dbProduct = await _context.Productos.FindAsync(productoId);
+
+            if (dbProduct is null)
+            {
+                return (false, "Producto no encontrado");
+            }
+
+            _context.Remove(dbProduct);
+            await _context.SaveChangesAsync();
+
+            return (true, "Producto eliminado");
+        }
+        catch (Exception ex)
+        {
+            return (false, $"Error {ex.Message}");
+        }
+    }
+
+    #endregion Productos
+
+
+
 }

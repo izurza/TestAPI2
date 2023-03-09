@@ -1,12 +1,11 @@
-﻿namespace TestAPI2.Models.DTOs
+﻿namespace TestAPI2.Models.DTOs;
+
+public class ProductoDto
 {
-    public class ProductoDto
-    {
-        public string? NombreProducto { get; set; }
+    public string? NombreProducto { get; set; }
 
-        public string? DescripcionProducto { get; set; }
+    public string? DescripcionProducto { get; set; }
 
-        public double? PrecioProducto { get; set; }
+    public double? PrecioProducto { get; set; }
 
-    }
 }

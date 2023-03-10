@@ -9,7 +9,7 @@ using TestAPI2.Services.Interfaces;
 
 namespace TestAPI2.Services;
 
-public class VentaService : IVentaService, IApiService
+public class VentaService : IVentaService, IScopedServices
 {
 
     private readonly VentaContext _context;

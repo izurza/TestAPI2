@@ -7,7 +7,7 @@ using System.Text;
 
 namespace TestAPI2.Services;
 
-public class ClientService : IClientService, IApiService
+public class ClientService : IClientService, IScopedServices
 {
 
     private readonly VentaContext _context;

@@ -1,5 +1,5 @@
 ﻿namespace TestAPI2.Services.Interfaces;
 
-public interface IApiService
+public interface IScopedServices
 {
 }

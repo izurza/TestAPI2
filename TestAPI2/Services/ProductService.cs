@@ -7,7 +7,7 @@ using TestAPI2.Services.Interfaces;
 
 namespace TestAPI2.Services;
 
-public class ProductService : IProductService, IApiService
+public class ProductService : IProductService, IScopedServices
 {
 
     private readonly VentaContext _context;

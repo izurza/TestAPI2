@@ -7,6 +7,8 @@ using Serilog.Formatting.Compact;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using System.Security.Claims;
+using Microsoft.AspNetCore.Authorization;
+using TestAPI2.Authorization;
 
 Log.Logger = new LoggerConfiguration()
     .MinimumLevel.Override("Microsoft.AspNetCore", LogEventLevel.Warning)
@@ -20,13 +22,13 @@ try
 {
     Log.Information("Starting web application");
     var builder = WebApplication.CreateBuilder(args);
-    builder.Services.AddAuthentication().AddJwtBearer();
-    builder.Services.AddAuthorization();
-    builder.Services.AddAuthorization();
+    //builder.Services.AddAuthentication().AddJwtBearer();
+    //builder.Services.AddAuthorization();
+    //builder.Services.AddAuthorization();
     //builder.Host.UseSerilog();
 
     string _connectionString = builder.Configuration.GetConnectionString("LocalDB");
-
+    string _domain = "https://" + builder.Configuration["Auth0:Domain"] + "/";
 
     builder.Services.ScanServices();
     //builder.Services.Scan(s => s
@@ -58,7 +60,7 @@ try
         .AddAuthentication (JwtBearerDefaults.AuthenticationScheme)
         .AddJwtBearer(options =>
         {
-            options.Authority = builder.Configuration["auth0:domain"];
+            options.Authority = _domain;
             options.Audience = builder.Configuration["auth0:audience"];
             // if the access token does not have a `sub` claim, `user.identity.name` will be `null`. map it to a different claim by setting the nameclaimtype below.
             options.TokenValidationParameters = new TokenValidationParameters
@@ -66,9 +68,16 @@ try
                 NameClaimType = ClaimTypes.NameIdentifier
             };
         });
+    builder.Services.AddConfiguredPoliciesAuthorization(_domain);
+    //builder.Services.AddAuthorization(options =>
+    //{
+    //    options.AddPolicy("read:Clientes", policy => policy.Requirements.Add(new HasScopeRequirement("read:Clientes", "https://" + builder.Configuration["Auth0:Domain"] + "/")));
+    //    options.AddPolicy("write:Clientes", policy => policy.Requirements.Add(new HasScopeRequirement("read:Clientes", "https://" + builder.Configuration["Auth0:Domain"] + "/")));
+    //    options.AddPolicy("delete:Clientes", policy => policy.Requirements.Add(new HasScopeRequirement("read:Clientes", "https://" + builder.Configuration["Auth0:Domain"] + "/")));
+    //    options.AddPolicy("write:Productos", policy => policy.Requirements.Add(new HasScopeRequirement("read:Clientes", "https://" + builder.Configuration["Auth0:Domain"] + "/")));
+    //    options.AddPolicy("delete:Productos", policy => policy.Requirements.Add(new HasScopeRequirement("read:Clientes", "https://" + builder.Configuration["Auth0:Domain"] + "/")));
 
-    //builder.Servicer.Add
-
+    //});
     builder.Host.UseSerilog((context, services, configuration) => configuration
       .ReadFrom.Configuration(context.Configuration)
       .ReadFrom.Services(services)
@@ -76,6 +85,7 @@ try
       .WriteTo.File(new CompactJsonFormatter(), "./logs/myapp.json")
       .WriteTo.Console());
 
+    builder.Services.AddSingleton<IAuthorizationHandler, HasScopeHandler>();
     var app = builder.Build();
 
     //app.UseConfiguredSerilogRequestLogging();
@@ -89,8 +99,8 @@ try
     app.MapCarter();
 
 
-    //app.UseAuthentication();
-    //app.UseAuthorization();
+    app.UseAuthentication();
+    app.UseAuthorization();
 
   
     app.Run();

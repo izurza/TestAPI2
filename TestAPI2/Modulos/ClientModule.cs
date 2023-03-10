@@ -29,7 +29,8 @@ public class ClientModule : CarterModule
                          : Results.NoContent();
         })
             .Produces<List<ClienteDto>>(StatusCodes.Status200OK)
-            .Produces(StatusCodes.Status204NoContent);
+            .Produces(StatusCodes.Status204NoContent)
+            .RequireAuthorization("read:Clientes");
 
         clientes.MapGet("/{id:int}", async (int id, IClientService clientService) =>
         {
@@ -39,7 +40,8 @@ public class ClientModule : CarterModule
                         : Results.NotFound();
         })
             .Produces<ClienteDto>(StatusCodes.Status200OK)
-            .Produces(StatusCodes.Status404NotFound);
+            .Produces(StatusCodes.Status404NotFound)
+            .RequireAuthorization("read:Clientes");
 
 
         clientes.MapPost("/", async (Cliente cliente, IClientService clientService) =>
@@ -50,7 +52,8 @@ public class ClientModule : CarterModule
                     : Results.BadRequest();
         })
             .Produces<ClienteDto>(StatusCodes.Status200OK)
-            .Produces(StatusCodes.Status400BadRequest);
+            .Produces(StatusCodes.Status400BadRequest)
+            .RequireAuthorization("write:Clientes");
 
 
         clientes.MapPut("/{id:int}", async(Cliente cliente, IClientService clientService) =>
@@ -61,7 +64,8 @@ public class ClientModule : CarterModule
                     : Results.BadRequest();
         })
             .Produces<ClienteDto>(StatusCodes.Status200OK)
-            .Produces(StatusCodes.Status400BadRequest);
+            .Produces(StatusCodes.Status400BadRequest)
+            .RequireAuthorization("write:Clientes");
 
 
         clientes.MapDelete("/{id:int}", async([FromRoute] int id, IClientService clientService) =>
@@ -70,7 +74,8 @@ public class ClientModule : CarterModule
             return result.Item1 ? Results.Ok(result.Item2) : Results.BadRequest(result.Item2);
         })
             .Produces<(bool, string)>(StatusCodes.Status200OK)
-            .Produces<(bool, string)>(StatusCodes.Status400BadRequest);
+            .Produces<(bool, string)>(StatusCodes.Status400BadRequest)
+            .RequireAuthorization("delete:Clientes");
         #endregion Clientes
     }
 }

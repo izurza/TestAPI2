@@ -1,12 +1,12 @@
 using Microsoft.EntityFrameworkCore;
-using TestAPI2.Services;
-using TestAPI2.Services.Interfaces;
 using Carter;
 using TestAPI2.Extensiones;
-using Microsoft.CodeAnalysis.VisualBasic.Syntax;
 using Serilog;
 using Serilog.Events;
 using Serilog.Formatting.Compact;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.IdentityModel.Tokens;
+using System.Security.Claims;
 
 Log.Logger = new LoggerConfiguration()
     .MinimumLevel.Override("Microsoft.AspNetCore", LogEventLevel.Warning)
@@ -20,9 +20,11 @@ try
 {
     Log.Information("Starting web application");
     var builder = WebApplication.CreateBuilder(args);
-
+    builder.Services.AddAuthentication().AddJwtBearer();
+    builder.Services.AddAuthorization();
+    builder.Services.AddAuthorization();
     //builder.Host.UseSerilog();
-  
+
     string _connectionString = builder.Configuration.GetConnectionString("LocalDB");
 
 
@@ -52,7 +54,20 @@ try
     //builder.Services.AddSwaggerGen();
 
     builder.Services.AddCarter();
+    builder.Services
+        .AddAuthentication (JwtBearerDefaults.AuthenticationScheme)
+        .AddJwtBearer(options =>
+        {
+            options.Authority = builder.Configuration["auth0:domain"];
+            options.Audience = builder.Configuration["auth0:audience"];
+            // if the access token does not have a `sub` claim, `user.identity.name` will be `null`. map it to a different claim by setting the nameclaimtype below.
+            options.TokenValidationParameters = new TokenValidationParameters
+            {
+                NameClaimType = ClaimTypes.NameIdentifier
+            };
+        });
 
+    //builder.Servicer.Add
 
     builder.Host.UseSerilog((context, services, configuration) => configuration
       .ReadFrom.Configuration(context.Configuration)
@@ -71,10 +86,13 @@ try
 
     app.UseHttpsRedirection();
 
-    //app.UseAuthorization();
-
     app.MapCarter();
 
+
+    //app.UseAuthentication();
+    //app.UseAuthorization();
+
+  
     app.Run();
 }
 catch (Exception ex)

@@ -1,4 +1,5 @@
-﻿using Serilog;
+﻿using Microsoft.CodeAnalysis.CSharp.Syntax;
+using Serilog;
 using Serilog.Events;
 
 namespace TestAPI2.Extensiones;
@@ -34,4 +35,6 @@ public static class WebApplicationExtensions
         });
         return app;
     }
+
+   
 }

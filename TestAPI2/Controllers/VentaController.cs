@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.StaticFiles;
 using System.Net.Mime;
 using TestAPI2.Models;
@@ -21,6 +22,7 @@ namespace TestAPI2.Controllers
         }
 
         [HttpGet("ventas")]
+        [Authorize]
         public async Task<IActionResult> GetVentas()
         {
             var ventas = await _ventaService.GetDetallesAsync();
@@ -33,6 +35,7 @@ namespace TestAPI2.Controllers
             return StatusCode(StatusCodes.Status200OK, ventas);
         }
         [HttpGet("detalle/{id}")]
+        [Authorize]
         public async Task<IActionResult> GetDetalle(int id)
         {
             var detalle = await _ventaService.GetDetalleAsync(id);
@@ -48,6 +51,7 @@ namespace TestAPI2.Controllers
         
 
         [HttpGet("Facturas")]
+        [Authorize]
         public async Task<IActionResult> GetFacturas()
         {
             var facturas = await _ventaService.GetFacturasAsync();
@@ -61,6 +65,7 @@ namespace TestAPI2.Controllers
         }
 
         [HttpPost("Comprar")]
+        [Authorize]
         public async Task<IActionResult> Comprar([FromForm] string nombreCliente, [FromForm] string apellidoCliente, [FromForm] int[] cantidades, [FromForm] int[] productos)//), [FromForm] string nombre)
         {
 

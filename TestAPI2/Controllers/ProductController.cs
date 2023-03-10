@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using TestAPI2.Models;
 using TestAPI2.Services.Interfaces;
 
@@ -15,7 +16,8 @@ namespace TestAPI2.Controllers
             _productService = productService;
         }
 
-        [HttpGet("producto")]
+        [HttpGet("productos")]
+        [AllowAnonymous]
         public async Task<IActionResult> GetProductos()
         {
             var productos = await _productService.GetProductosAsync();
@@ -28,6 +30,7 @@ namespace TestAPI2.Controllers
         }
 
         [HttpGet("producto/{id:int}")]
+        [Authorize]
         public async Task<IActionResult> GetProductos([FromRoute] int id)
         {
             var productos = await _productService.GetProductoAsync(id);
@@ -40,6 +43,7 @@ namespace TestAPI2.Controllers
         }
 
         [HttpPost("Nuevo Producto")]
+        [Authorize("write:Productos")]
         public async Task<IActionResult> AddProduct([FromForm] Producto product)
         {
             //insertar producto
@@ -48,6 +52,7 @@ namespace TestAPI2.Controllers
         }
 
         [HttpPut("Modificar Producto")]
+        [Authorize("write:Productos")]
         public async Task<IActionResult> UpdateProduct([FromForm] Producto product)
         {
             //Modificar producto
@@ -56,6 +61,7 @@ namespace TestAPI2.Controllers
         }
 
         [HttpDelete("Descatalogar Producto/{id:int}")]
+        [Authorize("delete:Productos")]
         public async Task<IActionResult> DeleteProduct([FromRoute] int id)
         {
             //Modificar producto

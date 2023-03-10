@@ -26,8 +26,10 @@ try
     // Add services to the container
     string _connectionString = builder.Configuration.GetConnectionString("LocalDB");
     string _domain = "https://" + builder.Configuration["Auth0:Domain"] + "/";
-    builder.Services.AddControllers();
-
+    builder.Services.AddControllers(); 
+    builder.Services.ScanServices();
+    builder.Services.ConfigureJsonOption();
+    builder.Services.AddPersistence(_connectionString);
 
     builder.Services
            .AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
@@ -42,15 +44,13 @@ try
                };
            });
     builder.Services.AddConfiguredPoliciesAuthorization(_domain);
-    builder.Services.ScanServices();
-    builder.Services.ConfigureJsonOption();
-    builder.Services.AddPersistence(_connectionString);
+
     builder.Services.AddSwagger();
     
     builder.Services.AddSingleton<IAuthorizationHandler, HasScopeHandler>();
     var app = builder.Build();
     app.UseSerilogRequestLogging();
-    // Configure the HTTP request pipeline.
+
     if (app.Environment.IsDevelopment())
     {
         app.MapSwagger();

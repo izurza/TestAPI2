@@ -43,10 +43,10 @@ builder.Services
 builder.Services.AddAuthorization(options =>
 {
     options.AddPolicy("read:Clientes", policy => policy.Requirements.Add(new HasScopeRequirement("read:Clientes", "https://" + builder.Configuration["Auth0:Domain"] + "/")));
-    options.AddPolicy("write:Clientes", policy => policy.Requirements.Add(new HasScopeRequirement("read:Clientes", "https://" + builder.Configuration["Auth0:Domain"] + "/")));
-    options.AddPolicy("delete:Clientes", policy => policy.Requirements.Add(new HasScopeRequirement("read:Clientes", "https://" + builder.Configuration["Auth0:Domain"] + "/")));
-    options.AddPolicy("write:Productos", policy => policy.Requirements.Add(new HasScopeRequirement("read:Clientes", "https://" + builder.Configuration["Auth0:Domain"] + "/")));
-    options.AddPolicy("delete:Productos", policy => policy.Requirements.Add(new HasScopeRequirement("read:Clientes", "https://" + builder.Configuration["Auth0:Domain"] + "/")));
+    options.AddPolicy("write:Clientes", policy => policy.Requirements.Add(new HasScopeRequirement("write:Clientes", "https://" + builder.Configuration["Auth0:Domain"] + "/")));
+    options.AddPolicy("delete:Clientes", policy => policy.Requirements.Add(new HasScopeRequirement("delete:Clientes", "https://" + builder.Configuration["Auth0:Domain"] + "/")));
+    options.AddPolicy("write:Productos", policy => policy.Requirements.Add(new HasScopeRequirement("write:Productos", "https://" + builder.Configuration["Auth0:Domain"] + "/")));
+    options.AddPolicy("delete:Productos", policy => policy.Requirements.Add(new HasScopeRequirement("delete:Productos", "https://" + builder.Configuration["Auth0:Domain"] + "/")));
 });
 builder.Services.AddScoped<IProductService, ProductService>();
 builder.Services.AddScoped<IVentaService, VentaService>();

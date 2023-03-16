@@ -12,7 +12,7 @@ public static class JSONConfigurationExtension
             o.SerializerOptions.IncludeFields = true;
             o.SerializerOptions.MaxDepth = 0;
             o.SerializerOptions.PropertyNameCaseInsensitive = true;
-            o.SerializerOptions.WriteIndented = true;
+            o.SerializerOptions.WriteIndented = false;
             o.SerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles;
         });
 

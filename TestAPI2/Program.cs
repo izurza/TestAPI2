@@ -20,7 +20,7 @@ Log.Logger = new LoggerConfiguration()
 
 try
 {
-    Log.Information("Starting web application");
+    Log.Information("Starting api");
     var builder = WebApplication.CreateBuilder(args);
     //builder.Services.AddAuthentication().AddJwtBearer();
     //builder.Services.AddAuthorization();
@@ -29,7 +29,7 @@ try
 
     string _connectionString = builder.Configuration.GetConnectionString("LocalDB");
     string _domain = "https://" + builder.Configuration["Auth0:Domain"] + "/";
-
+    bool blazorTesting = false;
     builder.Services.ScanServices();
     //builder.Services.Scan(s => s
         //.FromAssemblyOf<IApiService>()
@@ -56,8 +56,11 @@ try
     //builder.Services.AddSwaggerGen();
 
     builder.Services.AddCarter();
-    builder.Services
-        .AddAuthentication (JwtBearerDefaults.AuthenticationScheme)
+
+    if (!blazorTesting)
+    {
+        builder.Services
+        .AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
         .AddJwtBearer(options =>
         {
             options.Authority = _domain;
@@ -68,7 +71,10 @@ try
                 NameClaimType = ClaimTypes.NameIdentifier
             };
         });
-    builder.Services.AddConfiguredPoliciesAuthorization(_domain);
+        builder.Services.AddConfiguredPoliciesAuthorization(_domain);
+    }
+    
+
     //builder.Services.AddAuthorization(options =>
     //{
     //    options.AddPolicy("read:Clientes", policy => policy.Requirements.Add(new HasScopeRequirement("read:Clientes", "https://" + builder.Configuration["Auth0:Domain"] + "/")));
@@ -98,11 +104,14 @@ try
 
     app.MapCarter();
 
+    if (!blazorTesting)
+    {
+        app.UseAuthentication();
+        app.UseAuthorization();
+    }
 
-    app.UseAuthentication();
-    app.UseAuthorization();
 
-  
+
     app.Run();
 }
 catch (Exception ex)

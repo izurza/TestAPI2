@@ -1,0 +1,93 @@
+﻿@page "/productos"
+@using System.Text.Json;
+@using System.Text;
+@using TestAPI2.Models.DTOs;
+@inject HttpClient _http;
+@inject NavigationManager NavigationManager;
+
+<h3>CreateProduct</h3>
+
+<EditForm Model="@prod" OnValidSubmit="@Insert">
+    <DataAnnotationsValidator/>
+    <InputNumber id="id" @bind-Value=prod.IdProducto /><ValidationMessage For="@(() => prod.IdProducto)" />
+    <InputText id="nombre" @bind-Value=prod.NombreProducto placeholder="Nombre" /><ValidationMessage For="@(() => prod.NombreProducto)" />
+    <InputText id="descripcion" @bind-Value=prod.DescripcionProducto placeholder="Descripcion"/>
+    <InputNumber id="precio" @bind-Value=prod.PrecioProducto /><ValidationMessage For="@(() => prod.PrecioProducto)" />
+    <button type="submit">Insertar</button>
+</EditForm>
+<CascadingValue Value="productos">
+    <FetchProductos></FetchProductos>
+</CascadingValue>
+
+
+@code {
+    [Parameter]
+    public ProductoDto prod { get; set; } = new ProductoDto();
+    [Parameter]
+    public List<ProductoDto>? productos { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        string Baseurl = "https://localhost:7242/Productos";
+
+        try
+        {
+            using (var client = new HttpClient())
+            {
+                HttpRequestMessage request = new HttpRequestMessage();
+                request.RequestUri = new Uri(Baseurl);
+                request.Method = HttpMethod.Get;
+                //request.Headers.Add("SecureApiKey", "12345");
+                HttpResponseMessage response = await _http.SendAsync(request);
+
+                var statusCode = response.StatusCode;
+                if (response.IsSuccessStatusCode)
+                {
+                    productos = await response.Content.ReadFromJsonAsync<List<ProductoDto>>();
+                    string a = "sdfafa";
+                    Enumerable.ToArray(a);
+                }
+
+                else
+                {
+                    //API Call Failed, Check Error Details
+                }
+            }
+        }
+        catch (Exception ex)
+        {
+
+            throw;
+        }
+    }
+
+    public async void Insert(EditContext editContext)
+    {
+
+        HttpRequestMessage request = new HttpRequestMessage();
+        request.RequestUri = new Uri("https://localhost:7242/Productos/");
+        request.Method = HttpMethod.Post;
+        string json = JsonSerializer.Serialize(editContext.Model);
+        Console.WriteLine("json         sdfadf" + json);
+        //string json = "{\"client_id\":\"VDw18CHuSzw1FrxSvpPDA1PaFjoOqGhK\",\"client_secret\":\"3RFVRaRtJrcwaNl78pXCv2YW3rNgCIzrjFV3j2kFYzJiJQc_RqVGv1RRovv0niUU\",\"audience\":\"https://test/api\",\"grant_type\":\"client_credentials\"}";
+        request.Content = new StringContent(json, Encoding.UTF8, "application/json");
+        var response = await _http.SendAsync(request);
+        var result = await response.Content.ReadAsStringAsync();
+        Console.WriteLine("result asdfasdf" +result);
+
+        productos.Add(JsonSerializer.Deserialize<ProductoDto>(json));
+        ClearProducto();
+
+        StateHasChanged();
+        
+        Console.WriteLine(editContext.Model);
+    }
+
+    public void ClearProducto()
+    {
+        prod.IdProducto = 0;
+        prod.NombreProducto = "";
+        prod.DescripcionProducto = "";
+        prod.PrecioProducto = 0;
+    }
+}

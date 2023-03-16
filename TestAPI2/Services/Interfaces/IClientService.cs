@@ -1,5 +1,6 @@
 ﻿using TestAPI2.Models.DTOs;
 using TestAPI2.Models;
+using Microsoft.AspNetCore.Mvc;
 
 namespace TestAPI2.Services.Interfaces;
 
@@ -8,7 +9,7 @@ public interface IClientService
     //Clientes
     Task<List<ClienteDto>> GetClientesAsync();//Get ALL Clientes
     Task<ClienteDto> GetClienteAsync(int id);//Get a single Client
-    Task<byte[]> ClientesToCSV();
+    Task<IResult> ClientesToCSV();
     Task<Cliente> GetClienteByNameAsync(string name, string apellido);
     Task<ClienteDto> AddClienteAsync(Cliente client);//POST Client
     Task<int> ImportClientesFromCSVAsync(IFormFile clientCSV);

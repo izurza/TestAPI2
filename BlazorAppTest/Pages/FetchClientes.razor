@@ -1,0 +1,103 @@
+﻿@page "/fetchdata"
+@using System.Text;
+@using TestAPI2.Models.DTOs
+@using Services;
+@inject IClienteService ClienteService;
+@inject HttpClient http;
+@inject IJSRuntime JSRuntime;
+
+<PageTitle>Clientes</PageTitle>
+
+<h1>Clientes</h1>
+
+<p>This component demonstrates fetching data from a service.</p>
+
+@if (clientes == null)
+{
+    <p><em>Loading...</em></p>
+}
+else
+{
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Nombre</th>
+                <th>Apellido</th>
+                <th>Email</th>
+                <th>Direccion</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var cliente in clientes)
+            {
+                <tr>
+                    <td>@cliente.NombreCliente</td>
+                    <td>@cliente.ApellidoCliente</td>
+                    <td>@cliente.EmailCliente</td>
+                    <td>@cliente.DireccionCliente</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+    <p>
+        <label>
+            Upload file:
+                <InputFile OnChange="@OnInputFileChange"/>
+
+            
+        </label>
+    </p>
+    <div><button @onclick="OnClickDownloadButton">Descargar CSV</button></div>
+    <div><button @onclick="DownloadFileFromURL">Descargar CSV2</button></div>
+}
+
+@code {
+    
+    private List<ClienteDto>? clientes;
+
+    private async Task OnInputFileChange(InputFileChangeEventArgs e)
+    {
+        Console.WriteLine("ha cambiado");
+        var file = e.File;
+        await ClienteService.UploadCSV(file);
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+        clientes = await ClienteService.GetClientes();
+    }
+
+    protected override async Task OnParametersSetAsync()
+    {
+        try
+        {
+            clientes = await ClienteService.GetClientes();
+        }
+        catch (Exception e)
+        {
+           Console.WriteLine("Something went wrong" + e.Message);
+        }
+    }
+    private async Task OnClickDownloadButton()
+    {
+        var bytes = await ClienteService.GetCSV();
+        var fileName = "Clientes.csv";
+        var fileStream = new MemoryStream(bytes);
+        using var streamRef = new DotNetStreamReference(stream: fileStream);
+        await JSRuntime.InvokeVoidAsync(
+          "downloadFileFromStream",fileName,streamRef);
+    }
+
+    private async Task DownloadFileFromURL()// Recommended fo files bigger than 250Mb
+    {
+        var fileName = "Clientes.csv";
+        var fileURL = "https://localhost:7012/files/Clientes.csv";
+        await JSRuntime.InvokeVoidAsync("triggerFileDownload", fileName, fileURL);
+    }
+
+    //protected override async Task OnAfterRenderAsync(bool firstRender)
+    //{
+    //    var module = await JSRuntime.InvokeAsync<IJSObjectReference>("import", "~/Pages/FecthClientes.razor.js");
+    //    base.OnAfterRender(firstRender);
+    //}
+}

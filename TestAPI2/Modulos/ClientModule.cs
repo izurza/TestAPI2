@@ -1,7 +1,9 @@
 ﻿using Carter;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using System.IO;
 using System.Net;
+using System.Text;
 using TestAPI2.Context;
 using TestAPI2.Models;
 using TestAPI2.Models.DTOs;
@@ -32,6 +34,17 @@ public class ClientModule : CarterModule
             .Produces(StatusCodes.Status204NoContent)
             .RequireAuthorization("read:Clientes");
 
+         clientes.MapGet("/CSV", async (IClientService clientService) =>
+        {
+            return await clientService.ClientesToCSV()
+                         is IResult clientesCsv
+                         ? clientesCsv
+                         : Results.NoContent();
+        })
+            .Produces<IResult>(StatusCodes.Status200OK)
+            .Produces(StatusCodes.Status204NoContent)
+            .RequireAuthorization("read:Clientes");
+
         clientes.MapGet("/{id:int}", async (int id, IClientService clientService) =>
         {
             return await clientService.GetClienteAsync(id)
@@ -40,8 +53,8 @@ public class ClientModule : CarterModule
                         : Results.NotFound();
         })
             .Produces<ClienteDto>(StatusCodes.Status200OK)
-            .Produces(StatusCodes.Status404NotFound)
-            .RequireAuthorization("read:Clientes");
+            .Produces(StatusCodes.Status404NotFound);
+        //.RequireAuthorization("read:Clientes");
 
 
         clientes.MapPost("/", async (Cliente cliente, IClientService clientService) =>
@@ -52,11 +65,24 @@ public class ClientModule : CarterModule
                     : Results.BadRequest();
         })
             .Produces<ClienteDto>(StatusCodes.Status200OK)
-            .Produces(StatusCodes.Status400BadRequest)
-            .RequireAuthorization("write:Clientes");
+            .Produces(StatusCodes.Status400BadRequest);
+        //.RequireAuthorization("write:Clientes");
+        
+        clientes.MapPost("/CSV", async (HttpRequest request, IClientService clientService) =>
+        {
+            using var reader = new StreamReader(request.Body, Encoding.UTF8);
+            string filecontent = await reader.ReadToEndAsync();
+            Console.WriteLine(filecontent);
+            Console.WriteLine("File succesfully processed");
+            return "File succesfully processed";/* await clientService.AddClienteAsync(cliente)
+                is ClienteDto clienteDto
+                    ? Results.Ok(clienteDto)
+                    : Results.BadRequest();*/
+        })
+            .Accepts<IFormFile>("text/csv");
 
 
-        clientes.MapPut("/{id:int}", async(Cliente cliente, IClientService clientService) =>
+        clientes.MapPut("/{id:int}", async (Cliente cliente, IClientService clientService) =>
         {
             return await clientService.UpdateClienteAsync(cliente)
                 is ClienteDto clienteDto
@@ -64,18 +90,18 @@ public class ClientModule : CarterModule
                     : Results.BadRequest();
         })
             .Produces<ClienteDto>(StatusCodes.Status200OK)
-            .Produces(StatusCodes.Status400BadRequest)
-            .RequireAuthorization("write:Clientes");
+            .Produces(StatusCodes.Status400BadRequest);
+        //.RequireAuthorization("write:Clientes");
 
 
-        clientes.MapDelete("/{id:int}", async([FromRoute] int id, IClientService clientService) =>
+        clientes.MapDelete("/{id:int}", async ([FromRoute] int id, IClientService clientService) =>
         {
             var result = await clientService.DeleteClienteAsync(id);
             return result.Item1 ? Results.Ok(result.Item2) : Results.BadRequest(result.Item2);
         })
             .Produces<(bool, string)>(StatusCodes.Status200OK)
-            .Produces<(bool, string)>(StatusCodes.Status400BadRequest)
-            .RequireAuthorization("delete:Clientes");
+            .Produces<(bool, string)>(StatusCodes.Status400BadRequest);
+            //.RequireAuthorization("delete:Clientes");
         #endregion Clientes
     }
 }

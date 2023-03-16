@@ -4,6 +4,12 @@ using TestAPI2.Models;
 using TestAPI2.Services.Interfaces;
 using TestAPI2.Context;
 using System.Text;
+using Microsoft.AspNetCore.Mvc;
+using System.Globalization;
+using CsvHelper;
+using NuGet.Protocol;
+using CsvHelper.Configuration;
+using System.IO;
 
 namespace TestAPI2.Services;
 
@@ -80,30 +86,61 @@ public class ClientService : IClientService, IScopedServices
         }
     }
 
-    public async Task<byte[]> ClientesToCSV()
+    public async Task<IResult> ClientesToCSV()
     {
         List<ClienteDto> clientes = await _context.Clientes
-            .Select( c => new ClienteDto
+            .Select(c => new ClienteDto
             {
                 NombreCliente = c.NombreCliente.Trim(),
                 ApellidoCliente = c.ApellidoCliente.Trim(),
                 EmailCliente = c.EmailCliente.Trim(),
-                DireccionCliente= c.DireccionCliente.Trim()
+                DireccionCliente = c.DireccionCliente.Trim()
             })
             .ToListAsync();
-        StringBuilder sb = new StringBuilder();
-        sb.AppendLine("\"NombreCliente\";\"ApellidoCliente\";\"EmailCliente\";\"DireccionCliente\"");
-        //sb.AppendLine("\"NombreCliente\",\"ApellidoCliente\",\"EmailCliente\",\"DireccionCliente\"");
-        foreach (ClienteDto cliente in clientes)
-        {
-            sb.AppendLine(cliente.ToCSV());
-        }
-        string csv = sb.ToString();
+     
+        //using var ms = new MemoryStream();
+        //var sw = new StreamWriter(ms, Encoding.UTF8);
+        //await sw.WriteLineAsync("NombreCliente;ApellidoCliente;EmailCliente;DireccionCliente");
+        //foreach (var cliente in clientes)
+        //{
+        //    await sw.WriteLineAsync(cliente.ToCSV());
+        //}        
+        //await sw.FlushAsync();
+        //ms.Position = 0;
+        //return Results.File(ms.GetBuffer(), "text/csv", "download.csv");
+        
 
-        return Encoding.ASCII.GetBytes(csv);
+        using (var stream = new MemoryStream())
+        {
+            using (var writer = new StreamWriter(stream, Encoding.UTF8))//"C:/Windows/Temp/test.csv"
+            {
+                var config = new CsvConfiguration(CultureInfo.CurrentCulture)
+                {
+                    Delimiter = ";",
+                    Encoding = Encoding.UTF8
+                };
+                using var csvW = new CsvWriter(writer, config);
+
+                await csvW.WriteRecordsAsync(clientes);
+
+                await csvW.FlushAsync();
+                stream.Position = 0;
+                return Results.File(stream.GetBuffer(), "text/csv", "download.csv");
+               /* var fileStreamResult = new FileStreamResult(stream, "text/csv");
+                Console.WriteLine(fileStreamResult.FileStream.Length);
+                var streamResult = fileStreamResult.FileStream;
+                streamResult.Position = 0;
+                //////Estoy mandando un string en bytes, tengo que pasar un file
+                return streamResult;
+               */
+            }
+        }
+
+
+
     }
 
-    
+
 
     public async Task<ClienteDto?> AddClienteAsync(Cliente client)
     {

@@ -1,0 +1,63 @@
+﻿
+@using TestAPI2.Models.DTOs
+@inject HttpClient _http;
+
+
+
+<PageTitle>Productos</PageTitle>
+
+<h1>Productos</h1>
+
+<p>This component demonstrates fetching data from a service.</p>
+
+@if (productos == null)
+{
+    <p><em>Loading...</em></p>
+}
+else
+{
+    <table class="table">
+        <thead>
+            <tr>
+                <th>id</th>
+                <th>Nombre</th>
+                <th>Descripcion</th>
+                <th>Precio</th>
+                <th>Delete</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var producto in productos)
+            {
+                <tr>
+                    <td>@producto.IdProducto</td>
+                    <td>@producto.NombreProducto</td>
+                    <td>@producto.DescripcionProducto</td>
+                    <td>@producto.PrecioProducto</td>
+                    <td><button @onclick="@(e => DeleteProduct(producto))">Delete</button></td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+
+@code {
+    [CascadingParameter]
+    private List<ProductoDto>? productos { get; set; }
+
+
+    private async Task DeleteProduct(ProductoDto producto)
+    {
+        Console.WriteLine("Esta entrando con " + producto.NombreProducto);
+        using(var client = new HttpClient())
+        {
+            HttpRequestMessage request = new HttpRequestMessage();
+            request.RequestUri = new Uri("https://localhost:7242/Productos/"+producto.IdProducto);
+            request.Method = HttpMethod.Delete;
+            HttpResponseMessage response = await client.SendAsync(request);
+            productos.Remove(producto);
+            //StateHasChanged();
+
+        }
+    }
+}

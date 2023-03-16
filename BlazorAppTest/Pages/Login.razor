@@ -1,0 +1,27 @@
+﻿@page "/login"
+@using System.Text;
+@using System.Text.Json;
+@using BlazorAppTest.Services;
+@inject TokenService TokenService; 
+
+@inject HttpClient _http; 
+
+<h3>login</h3>
+
+<button @onclick=@GetToken>Renew token</button>
+@code {
+
+    async void GetToken()
+    {
+        TokenService.RenewToken();
+    }
+
+    private class Credential
+    {
+        public string client_id { get; set; }
+        public string client_secret { get; set; }
+        public string audience { get; set; }
+        public string grant_type { get; set; }
+
+    }
+}

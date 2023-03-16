@@ -67,6 +67,14 @@ public class ProductModule : CarterModule
         })
             .Produces<(bool, string)>(StatusCodes.Status200OK)
             .Produces<(bool, string)>(StatusCodes.Status400BadRequest);
+        
+        productos.MapDelete("/{nombre}", async ([FromRoute] string nombre, IProductService productService) =>
+    {
+            var result = await productService.DeleteProductoAsync(nombre);
+            return result.Item1 ? Results.Ok(result.Item2) : Results.BadRequest(result.Item2);
+        })
+            .Produces<(bool, string)>(StatusCodes.Status200OK)
+            .Produces<(bool, string)>(StatusCodes.Status400BadRequest);
         #endregion Productos
     }
 }

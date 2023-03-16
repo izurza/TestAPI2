@@ -11,4 +11,5 @@ public interface IProductService
     Task<ProductoDto> AddProductoAsync(Producto producto);//POST 
     Task<ProductoDto> UpdateProductoAsync(Producto producto);//PUT
     Task<(bool, string)> DeleteProductoAsync(int productoId);//DELETE
+    Task<(bool, string)> DeleteProductoAsync(string nombreProducto);//DELETE
 }

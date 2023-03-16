@@ -33,6 +33,7 @@ public class ProductService : IProductService, IScopedServices
                 .Where(i => i.IdProducto == id)
                 .Select(p => new ProductoDto
                 {
+                    IdProducto = p.IdProducto,
                     NombreProducto = p.NombreProducto,
                     DescripcionProducto = p.DescripcionProducto,
                     PrecioProducto = p.PrecioProducto
@@ -53,6 +54,7 @@ public class ProductService : IProductService, IScopedServices
                 .AsNoTracking()
                 .Select(p => new ProductoDto
                 {
+                    IdProducto = p.IdProducto,
                     NombreProducto = p.NombreProducto,
                     DescripcionProducto = p.DescripcionProducto,
                     PrecioProducto = p.PrecioProducto
@@ -77,6 +79,7 @@ public class ProductService : IProductService, IScopedServices
                 .Where(i => i.IdProducto == producto.IdProducto)
                 .Select(p => new ProductoDto
                 {
+                    IdProducto = p.IdProducto,
                     NombreProducto = p.NombreProducto,
                     DescripcionProducto = p.DescripcionProducto,
                     PrecioProducto = p.PrecioProducto
@@ -115,6 +118,30 @@ public class ProductService : IProductService, IScopedServices
         try
         {
             var dbProduct = await _context.Productos.FindAsync(productoId);
+
+            if (dbProduct is null)
+            {
+                return (false, "Producto no encontrado");
+            }
+
+            _context.Remove(dbProduct);
+            await _context.SaveChangesAsync();
+
+            return (true, "Producto eliminado");
+        }
+        catch (Exception ex)
+        {
+            return (false, $"Error {ex.Message}");
+        }
+    }
+    
+    public async Task<(bool, string)> DeleteProductoAsync(string nombreProducto)
+    {
+        try
+        {
+            var dbProduct = await _context.Productos.
+                Where( p => p.NombreProducto == nombreProducto)
+                .SingleOrDefaultAsync();
 
             if (dbProduct is null)
             {
